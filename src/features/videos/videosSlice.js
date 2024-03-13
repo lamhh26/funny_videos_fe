@@ -5,6 +5,7 @@ import {
   createEntityAdapter,
 } from "@reduxjs/toolkit";
 import client from "../../api/client";
+import { camelizeKeys, decamelizeKeys } from "humps";
 
 const videosAdapter = createEntityAdapter();
 const usersAdapter = createEntityAdapter();
@@ -12,29 +13,40 @@ const usersAdapter = createEntityAdapter();
 const initialState = videosAdapter.getInitialState({
   status: "idle",
   error: null,
+  hasMore: false,
   users: usersAdapter.getInitialState(),
 });
 
-export const fetchVideos = createAsyncThunk("videos/fetchVideos", async () => {
-  const response = await client.get("/videos");
-  const { data, included, meta } = response.data;
-  const formattedVideos = data.map(
-    ({ attributes, relationships, ...otherAttrs }) => ({
+export const fetchVideos = createAsyncThunk(
+  "videos/fetchVideos",
+  async (lastId, { rejectWithValue }) => {
+    let response;
+    try {
+      response = await client.get("/videos", {
+        params: decamelizeKeys({ lastId }),
+      });
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+    const { data, included, meta } = response.data;
+    const formattedVideos = data.map(
+      ({ attributes, relationships, ...otherAttrs }) => ({
+        ...otherAttrs,
+        ...attributes,
+        user: relationships.user.data,
+      })
+    );
+    const formattedUsers = included.map(({ attributes, ...otherAttrs }) => ({
       ...otherAttrs,
       ...attributes,
-      user: relationships.user.data,
-    })
-  );
-  const formattedUsers = included.map(({ attributes, ...otherAttrs }) => ({
-    ...otherAttrs,
-    ...attributes,
-  }));
-  return {
-    videos: formattedVideos,
-    users: formattedUsers,
-    hasNextPage: meta.hasNextPage,
-  };
-});
+    }));
+    return {
+      videos: formattedVideos,
+      users: formattedUsers,
+      hasNextPage: camelizeKeys(meta).hasNextPage,
+    };
+  }
+);
 
 const videosSlice = createSlice({
   name: "videos",
@@ -47,12 +59,13 @@ const videosSlice = createSlice({
       })
       .addCase(fetchVideos.fulfilled, (state, action) => {
         state.status = "succeeded";
+        state.hasMore = action.payload.hasNextPage;
         videosAdapter.upsertMany(state, action.payload.videos);
         usersAdapter.upsertMany(state.users, action.payload.users);
       })
       .addCase(fetchVideos.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.error.message;
+        state.error = action.payload.error;
       });
   },
 });
@@ -68,3 +81,5 @@ export const {
 export const { selectById: selectUserById } = usersAdapter.getSelectors(
   (state) => state.videos.users
 );
+
+export const selectHasMore = (state) => state.videos.hasMore;

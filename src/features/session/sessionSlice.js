@@ -50,5 +50,6 @@ const sessionSlice = createSlice({
 });
 
 export const selectCurrentUser = (state) => state.session.currentUser;
+export const selectIsLoggedIn = (state) => !!state.session.currentUser.id;
 
 export default sessionSlice.reducer;

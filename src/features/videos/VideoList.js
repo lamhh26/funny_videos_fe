@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, memo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Div, Icon, Text, Button } from "atomize";
+import { Div, Icon, Text, Button, Notification } from "atomize";
 import ReactPlayer from "react-player";
+import InfiniteScroll from "react-infinite-scroll-component";
 import {
-  selectAllVideos,
   fetchVideos,
   selectVideosIds,
   selectVideosById,
   selectUserById,
+  selectHasMore,
 } from "./videosSlice";
 
 const Video = ({ videoId }) => {
@@ -18,8 +19,8 @@ const Video = ({ videoId }) => {
     <Div m="3rem" p={{ b: "1rem" }}>
       <Div bg="white" shadow="4" rounded="xl">
         <Button
-          h="2.5rem"
-          w="2.5rem"
+          h="1.75rem"
+          w="1.75rem"
           bg="success300"
           hoverBg="success400"
           rounded="lg"
@@ -70,15 +71,25 @@ const Video = ({ videoId }) => {
 export const VideoList = () => {
   const dispatch = useDispatch();
   const orderedVideoIds = useSelector(selectVideosIds);
-
+  const lastVideoId = orderedVideoIds[orderedVideoIds.length - 1];
   const videoStatus = useSelector((state) => state.videos.status);
   const error = useSelector((state) => state.videos.error);
+  const hasMore = useSelector(selectHasMore);
+
+  const [showNotification, setShowNotification] = useState(false);
+  const infiniteFetchVideos = useCallback(() => {
+    dispatch(fetchVideos(lastVideoId));
+  }, [dispatch, lastVideoId]);
 
   useEffect(() => {
     if (videoStatus === "idle") {
-      dispatch(fetchVideos());
+      infiniteFetchVideos();
     }
-  }, [videoStatus, dispatch]);
+  }, [videoStatus, infiniteFetchVideos]);
+
+  useEffect(() => {
+    setShowNotification(videoStatus === "failed");
+  }, [videoStatus]);
 
   let content;
 
@@ -88,5 +99,40 @@ export const VideoList = () => {
     ));
   }
 
-  return <>{content}</>;
+  return (
+    <>
+      <InfiniteScroll
+        dataLength={orderedVideoIds.length}
+        next={infiniteFetchVideos}
+        hasMore={hasMore}
+        loader={<h4>Loading...</h4>}
+        endMessage={
+          <p style={{ textAlign: "center" }}>
+            <b>Yay! You have seen it all</b>
+          </p>
+        }
+      >
+        {content}
+      </InfiniteScroll>
+      {error && (
+        <Notification
+          bg="danger300"
+          hoverBg="danger400"
+          textColor="danger800"
+          isOpen={showNotification}
+          onClose={() => setShowNotification(false)}
+          prefix={
+            <Icon
+              name="Close"
+              color="danger800"
+              size="18px"
+              m={{ r: "0.5rem" }}
+            />
+          }
+        >
+          <Text>{error.detail.msg}</Text>
+        </Notification>
+      )}
+    </>
+  );
 };
