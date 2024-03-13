@@ -1,8 +1,11 @@
 import React, { useState } from "react";
-import { Div, Text, Icon, Button } from "atomize";
+import { Div, Text, Icon, Button, Container } from "atomize";
 import { Link } from "react-router-dom";
 import { LoginModal } from "../session/LoginModal";
 import { SignupModal } from "../session/SignupModal";
+import { VideoList } from "../videos/VideoList";
+import { useSelector } from "react-redux";
+import { selectCurrentUser } from "../session/sessionSlice";
 import "./layout.css";
 
 export const Layout = () => {
@@ -13,6 +16,9 @@ export const Layout = () => {
   const onLoginModalClosed = () => setShowLoginModal(false);
   const onSignupModalOpened = () => setShowSignupModal(true);
   const onSignupModalClosed = () => setShowSignupModal(false);
+
+  const currentUser = useSelector(selectCurrentUser);
+  const isLoggedIn = !!currentUser.id;
 
   return (
     <>
@@ -67,6 +73,9 @@ export const Layout = () => {
           </Div>
         </Div>
       </div>
+      <Container>
+        <VideoList />
+      </Container>
     </>
   );
 };
