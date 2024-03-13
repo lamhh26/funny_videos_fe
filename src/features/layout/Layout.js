@@ -1,11 +1,15 @@
 import React, { useState } from "react";
-import { Div, Text, Icon, Button, Container } from "atomize";
+import { Div, Text, Icon, Button, Tag, Container } from "atomize";
 import { Link } from "react-router-dom";
 import { LoginModal } from "../session/LoginModal";
 import { SignupModal } from "../session/SignupModal";
 import { VideoList } from "../videos/VideoList";
-import { useSelector } from "react-redux";
-import { selectIsLoggedIn } from "../session/sessionSlice";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  selectIsLoggedIn,
+  selectCurrentUser,
+  logout,
+} from "../session/sessionSlice";
 
 import "./layout.css";
 
@@ -59,8 +63,21 @@ const NonLoggedIn = () => {
 };
 
 const LoggedIn = () => {
+  const currentUser = useSelector(selectCurrentUser);
+  const dispatch = useDispatch();
+  const onLogoutClicked = () => dispatch(logout());
+
   return (
     <>
+      <Tag
+        bg={"success100"}
+        border="1px solid"
+        borderColor={"none"}
+        textColor={"success800"}
+        m={{ r: "0.5rem" }}
+      >
+        Welcome {currentUser.email}
+      </Tag>
       <Button
         h="2.5rem"
         p={{ x: "1rem" }}
@@ -88,6 +105,7 @@ const LoggedIn = () => {
         borderColor="info700"
         hoverBorderColor="info900"
         m={{ r: "0.5rem" }}
+        onClick={onLogoutClicked}
       >
         Logout
       </Button>
@@ -97,7 +115,7 @@ const LoggedIn = () => {
 
 export const Layout = () => {
   const isLoggedIn = useSelector(selectIsLoggedIn);
-  const content = isLoggedIn ? null : <NonLoggedIn />;
+  const content = isLoggedIn ? <LoggedIn /> : <NonLoggedIn />;
 
   return (
     <>

@@ -1,13 +1,6 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-import {
-  Button,
-  Div,
-  Input,
-  Icon,
-  Text,
-  Modal,
-} from "atomize";
+import { useSelector, useDispatch } from "react-redux";
+import { Button, Div, Input, Icon, Text, Modal } from "atomize";
 import { signup } from "./sessionSlice";
 
 export const SignupModal = ({ isOpen, onClose }) => {
@@ -18,6 +11,8 @@ export const SignupModal = ({ isOpen, onClose }) => {
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
 
+  const error = useSelector((state) => state.session.error.signup);
+  const hasDetailedError = error && error.detail;
   const dispatch = useDispatch();
 
   const onEmailChanged = (e) => setEmail(e.target.value);
@@ -38,12 +33,7 @@ export const SignupModal = ({ isOpen, onClose }) => {
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      align="start"
-      rounded="md"
-    >
+    <Modal isOpen={isOpen} onClose={onClose} align="start" rounded="md">
       <Icon
         name="Cross"
         pos="absolute"
@@ -63,6 +53,11 @@ export const SignupModal = ({ isOpen, onClose }) => {
           Signup
         </Text>
         <Div d="flex" flexDir="column" align="center" w="80%" m="0 auto">
+          {hasDetailedError && typeof error.detail === "string" && (
+            <Text textSize="caption" textColor="danger700">
+              {error.detail}
+            </Text>
+          )}
           <form
             classsname="form-signin"
             style={{ width: "100%" }}
@@ -74,6 +69,15 @@ export const SignupModal = ({ isOpen, onClose }) => {
               value={email}
               onChange={onEmailChanged}
             />
+            {hasDetailedError && error.detail.email && (
+              <Text
+                textSize="caption"
+                textColor="danger700"
+                p={{ l: "0.5rem" }}
+              >
+                {`Email ${error.detail.email[0]}`}
+              </Text>
+            )}
             <Input
               m={{ t: "1rem" }}
               placeholder="Password"
@@ -99,9 +103,18 @@ export const SignupModal = ({ isOpen, onClose }) => {
                 </Button>
               }
             />
+            {hasDetailedError && error.detail.password && (
+              <Text
+                textSize="caption"
+                textColor="danger700"
+                p={{ l: "0.5rem" }}
+              >
+                {`Password ${error.detail.password[0]}`}
+              </Text>
+            )}
             <Input
               m={{ t: "1rem" }}
-              placeholder="Password Confirmation"
+              placeholder="Password confirmation"
               type={showPasswordConfirmation ? "text" : "password"}
               value={passwordConfirmation}
               onChange={onPasswordConfirmationChanged}
@@ -126,6 +139,15 @@ export const SignupModal = ({ isOpen, onClose }) => {
                 </Button>
               }
             />
+            {hasDetailedError && error.detail.passwordConfirmation && (
+              <Text
+                textSize="caption"
+                textColor="danger700"
+                p={{ l: "0.5rem" }}
+              >
+                {`Password confirmation ${error.detail.passwordConfirmation[0]}`}
+              </Text>
+            )}
             <Div d="flex" align="center" m={{ t: "1rem" }}>
               <Div d="flex" flexGrow="1">
                 <Button bg="info700" type="submit">

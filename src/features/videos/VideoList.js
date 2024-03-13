@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, memo } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Div, Icon, Text, Button, Notification } from "atomize";
 import ReactPlayer from "react-player";
@@ -130,7 +130,7 @@ export const VideoList = () => {
             />
           }
         >
-          <Text>{error.detail.msg}</Text>
+          <Text>{error.detail}</Text>
         </Notification>
       )}
     </>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import {
   Button,
   Div,
@@ -18,13 +18,13 @@ export const LoginModal = ({ isOpen, onClose }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const error = useSelector((state) => state.session.error.login);
   const dispatch = useDispatch();
 
   const onEmailChanged = (e) => setEmail(e.target.value);
   const onPasswordChanged = (e) => setPassword(e.target.value);
   const onRememberMeChanged = (e) => setRememberMe(e.target.checked);
-  const onPasswordVisibleClicked = () =>
-    setShowPassword(!showPassword);
+  const onPasswordVisibleClicked = () => setShowPassword(!showPassword);
   const onFormSubmitted = (e) => {
     e.preventDefault();
     const user = {
@@ -36,12 +36,7 @@ export const LoginModal = ({ isOpen, onClose }) => {
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      align="start"
-      rounded="md"
-    >
+    <Modal isOpen={isOpen} onClose={onClose} align="start" rounded="md">
       <Icon
         name="Cross"
         pos="absolute"
@@ -61,6 +56,11 @@ export const LoginModal = ({ isOpen, onClose }) => {
           Login
         </Text>
         <Div d="flex" flexDir="column" align="center" w="80%" m="0 auto">
+          {error && (
+            <Text textSize="caption" textColor="danger700">
+              {error && error.detail ? error.detail : error}
+            </Text>
+          )}
           <form
             classsname="form-signin"
             style={{ width: "100%" }}
