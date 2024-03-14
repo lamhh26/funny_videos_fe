@@ -7,8 +7,7 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { Provider as StyletronProvider, DebugEngine } from "styletron-react";
 import { Client as Styletron } from "styletron-engine-atomic";
-
-// import './index.css';
+import { CableApp, CableContext } from "./contexts/cableContext";
 
 const container = document.getElementById("root");
 const root = createRoot(container);
@@ -23,7 +22,9 @@ root.render(
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <StyletronProvider value={engine} debug={debug} debugAfterHydration>
-          <App />
+          <CableContext.Provider value={CableApp.cable}>
+            <App />
+          </CableContext.Provider>
         </StyletronProvider>
       </PersistGate>
     </Provider>

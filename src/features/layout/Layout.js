@@ -1,8 +1,9 @@
-import React, { useState } from "react";
-import { Div, Text, Icon, Button, Tag, Container } from "atomize";
+import React, { useState, useContext, useEffect } from "react";
+import { Div, Text, Icon, Button, Tag, Container, Notification } from "atomize";
 import { Link, useNavigate } from "react-router-dom";
 import { LoginModal } from "../session/LoginModal";
 import { SignupModal } from "../session/SignupModal";
+import { CableContext } from "../../contexts/cableContext";
 import { useDispatch, useSelector } from "react-redux";
 import {
   selectIsLoggedIn,
@@ -11,6 +12,19 @@ import {
 } from "../session/sessionSlice";
 
 import "./layout.css";
+
+const formatMessage = ({ data, included }) => {
+  const { attributes, relationships, ...otherAttrs } = data;
+  const formattedVideo = {
+    ...otherAttrs,
+    ...attributes,
+  };
+  const formattedUsers = included.map(({ attributes, ...otherAttrs }) => ({
+    ...otherAttrs,
+    ...attributes,
+  }));
+  return { video: formattedVideo, user: formattedUsers[0] };
+};
 
 const NonLoggedIn = () => {
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -62,14 +76,45 @@ const NonLoggedIn = () => {
 };
 
 const LoggedIn = () => {
+  const [showNotification, setShowNotification] = useState(false);
+  const [sharedUser, setSharedUser] = useState({
+    id: null,
+    email: null,
+  });
+  const [sharedVideoTitle, setSharedVideoTitle] = useState("");
+
   const currentUser = useSelector(selectCurrentUser);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const cable = useContext(CableContext);
 
+  const onNotificationClosed = () => {
+    setShowNotification(false);
+    setSharedVideoTitle("");
+    setSharedUser({ id: null, email: null });
+  };
   const onLogoutClicked = () => dispatch(logout());
   const onShareClicked = () => {
     navigate("/share");
   };
+
+  useEffect(() => {
+    cable.subscriptions.create(
+      {
+        channel: "NotificationsChannel",
+      },
+      {
+        received: (message) => {
+          const { video, user } = formatMessage(message);
+          if (currentUser.id !== user.id) {
+            setSharedVideoTitle(video.title);
+            setSharedUser({ id: user.id, email: user.email });
+            setShowNotification(true);
+          }
+        },
+      }
+    );
+  }, [cable.subscriptions, currentUser]);
 
   return (
     <>
@@ -114,6 +159,28 @@ const LoggedIn = () => {
       >
         Logout
       </Button>
+      <Notification
+        bg="info100"
+        textColor="info800"
+        isOpen={showNotification}
+        onClose={() => {}}
+        suffix={
+          <Icon
+            name="Cross"
+            pos="absolute"
+            top="1rem"
+            right="0.5rem"
+            size="15px"
+            cursor="pointer"
+            m={{ r: "0.5rem" }}
+            onClick={onNotificationClosed}
+          />
+        }
+      >
+        <Text>
+          <b>{sharedUser.email}</b> has shared a video: "{sharedVideoTitle}"
+        </Text>
+      </Notification>
     </>
   );
 };

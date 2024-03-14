@@ -107,6 +107,8 @@ export const VideoList = () => {
     };
   }, [observerTarget, hasMore, lastVideoId, dispatch]);
 
+  const onNotificationClosed = () => setShowNotification(false);
+
   return (
     <>
       {orderedVideoIds.map((videoId) => (
@@ -123,7 +125,7 @@ export const VideoList = () => {
           hoverBg="danger400"
           textColor="danger800"
           isOpen={showNotification}
-          onClose={() => setShowNotification(false)}
+          onClose={onNotificationClosed}
           prefix={
             <Icon
               name="Close"

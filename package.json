@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.7",
+    "actioncable": "^5.2.8-1",
     "atomize": "^1.0.28",
     "axios": "^1.6.7",
     "humps": "^2.0.1",

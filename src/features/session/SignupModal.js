@@ -21,7 +21,7 @@ export const SignupModal = ({ isOpen, onClose }) => {
   const onPasswordConfirmationChanged = (e) =>
     setPasswordConfirmation(e.target.value);
   const onShowPasswordConfiramtionClicked = () =>
-    setShowPasswordConfirmation(!showPassword);
+    setShowPasswordConfirmation(!showPasswordConfirmation);
   const onFormSubmitted = (e) => {
     e.preventDefault();
     const user = {
