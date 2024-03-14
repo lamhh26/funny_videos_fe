@@ -11,7 +11,7 @@ export const SignupModal = ({ isOpen, onClose }) => {
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
 
-  const error = useSelector((state) => state.session.error.signup);
+  const error = useSelector((state) => state.session.signup.error);
   const hasDetailedError = error && error.detail;
   const dispatch = useDispatch();
 

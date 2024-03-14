@@ -14,9 +14,11 @@ import {
   selectIsLoggedIn,
 } from "./features/session/sessionSlice";
 import { Layout } from "./features/layout/Layout";
+import { VideoList } from "./features/videos/VideoList";
+import { AddVideo } from "./features/videos/AddVideo";
 
-const ProtectedRoute = ({ user, redirectPath = "/login" }) => {
-  if (!user.id) {
+const ProtectedRoute = ({ isLoggedIn, redirectPath = "/" }) => {
+  if (!isLoggedIn) {
     return <Navigate to={redirectPath} replace />;
   }
 
@@ -35,12 +37,25 @@ function App() {
     <div className="App">
       <StyleReset />
       <Router>
-        {isLoggedIn ? <Navigate to="/" /> : null}
         <Routes>
-          <Route path="/" element={<Layout />} />
-          {/* <Route element={<ProtectedRoute user={currentUser} />}>
-            <Route path="/" element={<HomePage />} />
-          </Route> */}
+          <Route
+            path="/"
+            element={
+              <Layout>
+                <VideoList />
+              </Layout>
+            }
+          />
+          <Route element={<ProtectedRoute isLoggedIn={isLoggedIn} />}>
+            <Route
+              path="/share"
+              element={
+                <Layout>
+                  <AddVideo />
+                </Layout>
+              }
+            />
+          </Route>
         </Routes>
       </Router>
     </div>

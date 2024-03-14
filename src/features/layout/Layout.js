@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { Div, Text, Icon, Button, Tag, Container } from "atomize";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { LoginModal } from "../session/LoginModal";
 import { SignupModal } from "../session/SignupModal";
-import { VideoList } from "../videos/VideoList";
 import { useDispatch, useSelector } from "react-redux";
 import {
   selectIsLoggedIn,
@@ -65,7 +64,12 @@ const NonLoggedIn = () => {
 const LoggedIn = () => {
   const currentUser = useSelector(selectCurrentUser);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const onLogoutClicked = () => dispatch(logout());
+  const onShareClicked = () => {
+    navigate("/share");
+  };
 
   return (
     <>
@@ -90,6 +94,7 @@ const LoggedIn = () => {
         borderColor="info700"
         hoverBorderColor="info900"
         m={{ r: "0.5rem" }}
+        onClick={onShareClicked}
       >
         Share a video
       </Button>
@@ -113,7 +118,7 @@ const LoggedIn = () => {
   );
 };
 
-export const Layout = () => {
+export const Layout = ({ children }) => {
   const isLoggedIn = useSelector(selectIsLoggedIn);
   const content = isLoggedIn ? <LoggedIn /> : <NonLoggedIn />;
 
@@ -132,9 +137,7 @@ export const Layout = () => {
           <Div d="flex">{content}</Div>
         </Div>
       </div>
-      <Container>
-        <VideoList />
-      </Container>
+      <Container>{children}</Container>
     </>
   );
 };

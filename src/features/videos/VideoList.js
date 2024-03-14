@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Div, Icon, Text, Button, Notification } from "atomize";
 import ReactPlayer from "react-player";
-import InfiniteScroll from "react-infinite-scroll-component";
 import {
   fetchVideos,
   selectVideosIds,
@@ -72,48 +71,52 @@ export const VideoList = () => {
   const dispatch = useDispatch();
   const orderedVideoIds = useSelector(selectVideosIds);
   const lastVideoId = orderedVideoIds[orderedVideoIds.length - 1];
-  const videoStatus = useSelector((state) => state.videos.status);
-  const error = useSelector((state) => state.videos.error);
+  const videoStatus = useSelector((state) => state.videos.fetchVideos.status);
+  const error = useSelector((state) => state.videos.fetchVideos.error);
   const hasMore = useSelector(selectHasMore);
 
   const [showNotification, setShowNotification] = useState(false);
-  const infiniteFetchVideos = useCallback(() => {
-    dispatch(fetchVideos(lastVideoId));
-  }, [dispatch, lastVideoId]);
-
-  useEffect(() => {
-    if (videoStatus === "idle") {
-      infiniteFetchVideos();
-    }
-  }, [videoStatus, infiniteFetchVideos]);
 
   useEffect(() => {
     setShowNotification(videoStatus === "failed");
   }, [videoStatus]);
 
-  let content;
+  const observerTarget = useRef(null);
 
-  if (videoStatus === "succeeded") {
-    content = orderedVideoIds.map((videoId) => (
-      <Video key={videoId} videoId={videoId} />
-    ));
-  }
+  useEffect(() => {
+    let observerRefValue = null;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          dispatch(fetchVideos(lastVideoId));
+        }
+      },
+      { threshold: 1 }
+    );
+
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current);
+      observerRefValue = observerTarget.current;
+    }
+
+    return () => {
+      if (observerRefValue) {
+        observer.unobserve(observerRefValue);
+      }
+    };
+  }, [observerTarget, hasMore, lastVideoId, dispatch]);
 
   return (
     <>
-      <InfiniteScroll
-        dataLength={orderedVideoIds.length}
-        next={infiniteFetchVideos}
-        hasMore={hasMore}
-        loader={<h4>Loading...</h4>}
-        endMessage={
-          <p style={{ textAlign: "center" }}>
-            <b>Yay! You have seen it all</b>
-          </p>
-        }
-      >
-        {content}
-      </InfiniteScroll>
+      {orderedVideoIds.map((videoId) => (
+        <Video key={videoId} videoId={videoId} />
+      ))}
+      {videoStatus === "loading" && (
+        <Div textAlign="center">
+          <Icon name="Loading2" size="30px" />
+        </Div>
+      )}
       {error && (
         <Notification
           bg="danger300"
@@ -133,6 +136,7 @@ export const VideoList = () => {
           <Text>{error.detail}</Text>
         </Notification>
       )}
+      <div ref={observerTarget}></div>
     </>
   );
 };

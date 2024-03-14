@@ -18,7 +18,7 @@ export const LoginModal = ({ isOpen, onClose }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const error = useSelector((state) => state.session.error.login);
+  const error = useSelector((state) => state.session.login.error);
   const dispatch = useDispatch();
 
   const onEmailChanged = (e) => setEmail(e.target.value);

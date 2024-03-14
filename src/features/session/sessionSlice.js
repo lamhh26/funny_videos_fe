@@ -3,12 +3,15 @@ import client from "../../api/client";
 import { camelizeKeys, decamelizeKeys } from "humps";
 
 const initialState = {
-  status: "idle",
-  error: {
-    login: null,
-    signup: null,
+  login: {
+    status: "idle",
+    error: null,
   },
-  currentUser: {},
+  signup: {
+    status: "idle",
+    error: null,
+  },
+  currentUser: { id: null, email: "" },
 };
 
 export const login = createAsyncThunk(
@@ -57,29 +60,31 @@ const sessionSlice = createSlice({
   extraReducers(builder) {
     builder
       .addCase(login.pending, (state) => {
-        state.status = "loading";
+        state.login.status = "loading";
       })
       .addCase(login.fulfilled, (state, action) => {
-        state.status = "succeeded";
+        state.login.status = "succeeded";
         state.currentUser = action.payload.user;
+        state.login.error = null;
       })
       .addCase(login.rejected, (state, action) => {
-        state.status = "failed";
-        state.error.login = action.payload.error;
+        state.login.status = "failed";
+        state.login.error = action.payload.error;
       })
       .addCase(signup.pending, (state) => {
-        state.status = "loading";
+        state.signup.status = "loading";
       })
       .addCase(signup.fulfilled, (state, action) => {
-        state.status = "succeeded";
+        state.signup.status = "succeeded";
         state.currentUser = action.payload.user;
+        state.signup.error = null;
       })
       .addCase(signup.rejected, (state, action) => {
-        state.status = "failed";
-        state.error.signup = action.payload.error;
+        state.signup.status = "failed";
+        state.signup.error = action.payload.error;
       })
       .addCase(logout.fulfilled, (state) => {
-        state.currentUser = {};
+        state.currentUser = { id: null, email: "" };
       })
       .addCase(fetchCurrentUser.fulfilled, (state, action) => {
         state.currentUser = action.payload.user;
