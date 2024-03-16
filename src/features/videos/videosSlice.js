@@ -33,7 +33,11 @@ export const fetchVideos = createAsyncThunk(
         params: decamelizeKeys({ lastId }),
       });
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(
+        error.response
+          ? error.response.data
+          : { error: { detail: error.message } }
+      );
     }
     const { data, included, meta } = response.data;
     const formattedVideos = data.map(
