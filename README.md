@@ -1,46 +1,64 @@
-# Getting Started with Create React App and Redux
+### Overview
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app), using the [Redux](https://redux.js.org/) and [Redux Toolkit](https://redux-toolkit.js.org/) template.
+This is a web app for sharing YouTube videos using React and Redux running in Docker.
 
-## Available Scripts
+### Features
 
-In the project directory, you can run:
+1. User registration and login.
+2. Sharing YouTube videos.
+3. Viewing a list of shared videos (no need to display up/down votes).
+4. Real-time notifications for new video shares: When a user shares a new video, other logged-in users should receive a real-time notification about the newly shared video.
 
-### `npm start`
+### Prerequisites:
+- Docker
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### Installation & Configuration:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Cloning the repository:
 
-### `npm test`
+```
+git clone git@github.com:lamhh26/funny_videos_fe.git
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+# Or
 
-### `npm run build`
+git clone https://github.com/lamhh26/funny_videos_fe.git
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Configuring settings and building:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```
+cp .env.example .env
+docker compose build
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+# Build a image from Dockerfile
+docker build -f Dockerfile.dev -t funny-videos-fe .
+```
 
-### `npm run eject`
+#### Running the development application
+```
+docker compose up -d
+```
+After that you can see the app at http://localhost:3001.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Usage
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+User can register/login a account.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+![login-signup](https://github.com/lamhh26/funny_videos_fe/assets/17271336/546730b7-f85d-410f-bbfb-acab960f2cdc)
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Both logged in and non logged in users can view the list of shared videos. The video list is designed with infinite scrolling.
 
-## Learn More
+![infinite_scroll](https://github.com/lamhh26/funny_videos_fe/assets/17271336/de020691-3048-4db3-b358-6bcd65aaf0b1)
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Only logged in users can share videos. After sharing, other logged in users will receive a notification
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+![noti](https://github.com/lamhh26/funny_videos_fe/assets/17271336/3d880d4a-0c66-48e6-829e-b47607e1c125)
+
+### Troubleshooting
+
+Because when executing `docker compose run` and `docker run` we specify fixed container names so the error like `The container name "[CONTAINER_NAME]" is already in use by container ` may occur. Then we need to stop and delete the previously existing container.
+
+```
+docker stop [CONTAINER_NAME]
+docker rm [CONTAINER_NAME]
+```
