@@ -28,7 +28,6 @@ Configuring settings and building:
 
 ```
 cp .env.example .env
-docker compose build
 
 # Build a image from Dockerfile
 docker build -f Dockerfile.dev -t funny-videos-fe .
@@ -36,7 +35,7 @@ docker build -f Dockerfile.dev -t funny-videos-fe .
 
 #### Running the development application
 ```
-docker compose up -d
+docker run -p 3001:3001 --name frontend --rm -d funny-videos-fe
 ```
 After that you can see the app at http://localhost:3001.
 
