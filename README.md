@@ -42,15 +42,17 @@ After that you can see the app at http://localhost:3001.
 
 ### Usage
 
-User can register/login a account.
+- User can register/login a account.
 
 ![login-signup](https://github.com/lamhh26/funny_videos_fe/assets/17271336/546730b7-f85d-410f-bbfb-acab960f2cdc)
 
-Both logged in and non logged in users can view the list of shared videos. The video list is designed with infinite scrolling.
+- Both logged in and non logged in users can view the list of shared videos. The video list is designed with infinite scrolling.
 
 ![infinite_scroll](https://github.com/lamhh26/funny_videos_fe/assets/17271336/de020691-3048-4db3-b358-6bcd65aaf0b1)
 
-Only logged in users can share videos. After sharing, other logged in users will receive a notification
+- Can only share Youtube link.
+
+- Only logged in users can share videos. After sharing, other logged in users will receive a notification
 
 ![noti](https://github.com/lamhh26/funny_videos_fe/assets/17271336/3d880d4a-0c66-48e6-829e-b47607e1c125)
 
