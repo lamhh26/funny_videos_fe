@@ -7,10 +7,10 @@ This is a web app for sharing YouTube videos using React and Redux running in Do
 1. User registration and login.
 2. Sharing YouTube videos.
 3. Viewing a list of shared videos (no need to display up/down votes).
-4. Real-time notifications for new video shares: When a user shares a new video, other logged-in users should receive a real-time notification about the newly shared video.
+4. Real-time notifications for new video shares: When a user shares a new video, other logged-in users could receive a real-time notification about the newly shared video.
 
 ### Prerequisites:
-- Docker
+- Docker.
 
 ### Installation & Configuration:
 
